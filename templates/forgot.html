@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Відновлення пароля - Безпечна система</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; color: #333; font-size: 20px; }
+        label { display: block; margin-top: 15px; font-size: 14px; color: #555; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background: #ffc107; color: #333; border: none; padding: 10px; margin-top: 20px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #e0a800; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .alert-error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; display: none; }
+        .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Відновлення пароля</h2>
+
+        <div id="error-msg" class="alert-error"></div>
+        <div id="success-msg" class="alert-success"></div>
+
+        <form id="forgot-form">
+            <label>Введіть ваш Email:</label>
+            <input type="email" name="email" required placeholder="user@example.com">
+
+            <button type="submit">Надіслати інструкції</button>
+        </form>
+        <div class="links">
+            <a href="/login-page">Повернутися до входу</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('forgot-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const errorDiv = document.getElementById('error-msg');
+            const successDiv = document.getElementById('success-msg');
+
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/forgot-password', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    errorDiv.innerText = result.detail || "Сталася помилка";
+                    errorDiv.style.display = 'block';
+                } else {
+                    successDiv.innerText = result.message + " (Перевірте консоль сервера)";
+                    successDiv.style.display = 'block';
+                    this.reset();
+                }
+            } catch (err) {
+                errorDiv.innerText = "Помилка зв'язку з сервером.";
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
